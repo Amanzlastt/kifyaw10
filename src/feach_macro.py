@@ -15,9 +15,25 @@ NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 
 # Define economic indicators to fetch from FRED
 FRED_INDICATORS = {
-    "GDP": "GDP",
-    "Inflation": "CPIAUCSL",
-    "Interest Rate": "FEDFUNDS"
+    # USA
+    "US_GDP": "GDP",
+    "US_Inflation": "CPIAUCSL",
+    "US_Interest_Rate": "FEDFUNDS",
+    
+    # Russia
+    "Russia_GDP": "RGDPNAQRUA666NRUG",
+    "Russia_Inflation": "CPALTT01RUM657N",
+    
+    # European Union
+    "EU_GDP": "CLVMNACSCAB1GQEA19",
+    "EU_Inflation": "CP0000EZ19M086NEST",
+
+    "Saudi_GDP": "MKTGDPKSA",  # Saudi Arabia GDP
+    "Saudi_Inflation": "SAUPZQ",  # Saudi Arabia Consumer Price Index
+    
+    "Canada_GDP": "CANRGDPR",  # Canada Real GDP
+    "Canada_Inflation": "CPALCY01CAA661N",  # Canada CPI
+
 }
 
 # fUNCTION TO FETCH MACROECONOMIC DATA FROM FRED
@@ -70,22 +86,22 @@ def main():
     start_date = brent_data["Date"].min()
     end_date = brent_data['Date'].max()
 
-    # #   featch macro economic data
-    # macro_data = {}
-    # for indicator, series_id in FRED_INDICATORS.items():
-    #     macro_data[indicator] = fetch_fred_data(series_id, start_date, end_date)
+    #   featch macro economic data
+    macro_data = {}
+    for indicator, series_id in FRED_INDICATORS.items():
+        macro_data[indicator] = fetch_fred_data(series_id, start_date, end_date)
     
-    # fetch news sentiment
-    news_data = {date: fetch_news_sentiment(date) for date in brent_data['Date'].astype(str)}
+    # # fetch news sentiment
+    # news_data = {date: fetch_news_sentiment(date) for date in brent_data['Date'].astype(str)}
 
-    # # Merge all data into brent oil dataset
-    # for indicator in macro_data:
-    #     brent_data[indicator] = brent_data['Date'].astype(str).map(macro_data[indicator])
+    # Merge all data into brent oil dataset
+    for indicator in macro_data:
+        brent_data[indicator] = brent_data['Date'].astype(str).map(macro_data[indicator])
     
-    brent_data['News Headlines'] = brent_data['Date'].astype(str).map(news_data)
+    # brent_data['News Headlines'] = brent_data['Date'].astype(str).map(news_data)
 
     # save final dataset
-    brent_data.to_csv("brent_oil_enricled_2.csv", index= False)
+    brent_data.to_csv("brent_oil_enricled.csv", index= False)
     print ("Data collection complete. Output saved to brent_oil_enriched.csv")
 
 if __name__ == "__main__":
